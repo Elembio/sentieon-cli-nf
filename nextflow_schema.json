@@ -19,29 +19,9 @@
           "type": "string",
           "hidden": true
         },
-        "fasta_dir": {
-          "type": "string",
-          "hidden": true
-        },
-        "genome_file": {
-          "type": "string",
-          "hidden": true
-        },
-        "bwa_index": {
-          "type": "string",
-          "hidden": true
-        },
-        "genome_dict": {
-          "type": "string",
-          "hidden": true
-        },
         "publish_dir_mode": {
           "type": "string",
           "default": "copy",
-          "hidden": true
-        },
-        "chrom_sizes": {
-          "type": "string",
           "hidden": true
         }
       }
@@ -61,7 +41,8 @@
           "default": "./results"
         },
         "genome": {
-          "type": "string"
+          "type": "string",
+          "default": "GRCh38"
         },
         "ignore_samples": {
           "type": "string",
@@ -79,7 +60,7 @@
         },
         "igenomes_base": {
           "type": "string",
-          "default": "s3://elembio-macro-reference/igenomes"
+          "default": "s3://ngi-igenomes/igenomes"
         },
         "igenomes_ignore": {
           "type": "boolean"
@@ -170,5 +151,40 @@
     {
       "$ref": "#/definitions/generic_options"
     }
-  ]
+  ],
+  "properties": {
+    "use_elembio_igenomes": {
+      "type": "boolean"
+    },
+    "sentieon_license": {
+      "type": "string",
+      "default": "52.12.17.193:8990"
+    },
+    "sentieon_ml_model": {
+      "type": "string"
+    },
+    "sentieoncli_container_url": {
+      "type": "string",
+      "default": "147637153406.dkr.ecr.us-west-2.amazonaws.com/modules/sentieon-cli"
+    },
+    "sentieoncli_container_tag": {
+      "type": "number",
+      "default": 202308.03
+    },
+    "max_memory": {
+      "type": "string",
+      "default": "144.GB"
+    },
+    "max_cpus": {
+      "type": "integer",
+      "default": 72
+    },
+    "max_time": {
+      "type": "string",
+      "default": "48.h"
+    },
+    "bwa": {
+      "type": "string"
+    }
+  }
 }
