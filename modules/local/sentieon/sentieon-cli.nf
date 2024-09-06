@@ -5,9 +5,9 @@ process SENTIEON_CLI {
     container "${params.sentieoncli_container_url}:${params.sentieoncli_container_tag}"
 
     input:
-    tuple val(meta), path(fastq)
-    path index
-    path fasta 
+    tuple val(meta), path(r1_fastq), path(r2_fastq)
+    path index, stageAs: "index/*"
+    tuple path(fasta), path(fai)
     path ml_model
 
     output:
@@ -18,7 +18,7 @@ process SENTIEON_CLI {
     script:
     def args = task.ext.args ?: ''
 
-    def license    = params.sentieon_license
+    def license = params.sentieon_license
     def prefix = meta.prefix ? "${meta.prefix}" : "${meta.id}"
     def read_group = meta.read_group ? "${meta.read_group}__${meta.sample}" : "RG"
     def platform = meta.platform ? "${meta.platform}" : "PL"
@@ -34,40 +34,27 @@ process SENTIEON_CLI {
     LICENSE=$license
     export SENTIEON_LICENSE=$license
 
-    sentieon bwa mem \\
-        ${model_option} \\
-        -M -R "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform" \\
+    find -L $index/ -type f \\! -name "*.fa" -exec ln -s {} . \\;
+
+    #INDEX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
+    #FASTA=`find -L ./ -maxdepth 1 -name "*.fa"`
+
+    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
+
+    sentieon-cli dnascope \\
         -t $task.cpus \\
-        -K 10000000 \\
-        \$INDEX \\
-        $fastq \\
-        | sentieon util sort \$bam_option -r $fasta -o ${prefix}.bam -t $task.cpus --sam2bam -i -
+        -r $fasta \\
+        --r1-fastq ${r1_fastq} \\
+        --r2-fastq ${r2_fastq} \\
+        --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" \\
+        --model-bundle $ml_model \\
+        --pcr-free \\
+        --assay WGS \\
+        ${prefix}.vcf.gz
 
-    # genome
-    #sentieon-cli \
-    #    -r GCA_000001405.15_GRCh38_no_alt_analysis_set_maskedGRC_exclusions_v2.fasta \
-    #    --r1-fastq my_sample.r1.fastq.gz \
-    #    --r2-fastq my_sample.r2.fastq.gz \
-    #    --readgroups '@RG\tID:my_sample-1\tSM:my_sample\tPL:ELEMENT\tLB:my_sample-lib1' \
-    #    --model-bundle DNAscopeElementBioWGS2.0.bundle \
-    #    --bed canonical_contigs.bed \
-    #    --dbsnp Homo_sapiens_assembly38.dbsnp138.vcf.gz \
-    #    --pcr-free \
-    #    --assay WGS \
-    #    my_sample.vcf.gz
+    touch ${prefix}.bam
+    touch ${prefix}.bam.bai
 
-    # exome
-    #sentieon-cli \
-    #    -r GCA_000001405.15_GRCh38_no_alt_analysis_set_maskedGRC_exclusions_v2.fasta \
-    #    --r1-fastq my_sample.r1.fastq.gz \
-    #    --r2-fastq my_sample.r2.fastq.gz \
-    #    --readgroups '@RG\tID:my_sample-1\tSM:my_sample\tPL:ELEMENT\tLB:my_sample-lib1' \
-    #    --model-bundle DNAscopeElementBioWGS2.0.bundle \
-    #    --bed targets_hg38.bed \
-    #      --interval_padding 200 \
-    #    --dbsnp Homo_sapiens_assembly38.dbsnp138.vcf.gz \
-    #    --assay WES \
-    #    my_sample.vcf.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

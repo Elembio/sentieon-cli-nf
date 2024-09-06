@@ -4,6 +4,7 @@ nextflow.enable.dsl = 2
 
 // Pull in igenomes
 params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.fasta_fai = params.fasta+".fai"
 params.bwa = WorkflowMain.getGenomeAttribute(params, 'bwa')
 
 log.info """\
@@ -15,7 +16,9 @@ log.info """\
  ======================================================
  genome: ${params.genome}
  fasta: ${params.fasta}
+ fasta_fai: ${params.fasta_fai}
  bwa: ${params.bwa}
+ sentieon_ml_modle: ${params.sentieon_ml_model}
  known_sites: ${params.known_sites}
  igenomes_base: ${params.igenomes_base}
  igenomes_ignore: ${params.igenomes_ignore}
@@ -32,52 +35,38 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 
 include { SENTIEON_CLI } from './modules/local/sentieon/sentieon-cli'
 
-def model_file = params.model_file ? file(params.model_file, checkIfExists: true) : [] 
-def interval_bed = params.interval_bed ? file(params.model_file, checkIfExists: true) : [] 
+def model_file = params.sentieon_ml_model ? file(params.sentieon_ml_model, checkIfExists: true) : [] 
+def interval_bed = params.interval_bed ? file(params.interval_bed, checkIfExists: true) : [] 
 
 workflow {  
 
     ch_versions = Channel.empty()
 
-    ch_genome = [params.fasta]
-    ch_bwa = params.fasta ? params.bwa ? Channel.fromPath(params.bwa).collect() : [] : []
+    ch_genome = [params.fasta, params.fasta_fai]
 
-    // parse input samplesheet
     Channel.value(ch_input)
-            .splitCsv ( header:true, sep:',' )
-            .set { sheet }
-
-    // create ch_fastq
-    ch_fastq = sheet.map { row -> [[row.sample], row] }
-                .groupTuple()
-                .map { meta, rows ->
-                    [rows, rows.size()]
-                }
-                .transpose()
-                .map { row, numLanes ->
-                    create_fastq_channel(row + [num_lanes:numLanes])
-                }
+        .splitCsv(header: true, sep: ',')
+        .map { row -> 
+            // Process each row individually
+            create_fastq_channel(row)
+        }
+        .set { ch_fastq }
 
     // convert known sites to ch
     ch_known_sites = Channel.of(params.known_sites)
-    
+
     // fastq -> bam (fq2bam)
     SENTIEON_CLI (
         ch_fastq,
         params.bwa,
         ch_genome,
-        ch_known_sites
+        model_file
     )
     ch_versions = ch_versions.mix(SENTIEON_CLI.out.versions.first())
 
 }
 
 def create_fastq_channel(LinkedHashMap row) {
-
-    def fields = [
-        'r1_fastq': ['meta': [:], 'read_num': 'R1'],
-        'r2_fastq': ['meta': [:], 'read_num': 'R2']
-    ]
 
     def meta = [
         id: row.sample,
@@ -87,7 +76,14 @@ def create_fastq_channel(LinkedHashMap row) {
         platform: row.platform,
         gender: row.gender,
         num_lanes: row.num_lanes,
-        single_end: false
+        single_end: false  // Default to paired-end
+    ]
+    
+    def fields = [
+        'r1_fastq': ['meta': [:], 'read_num': 'R1'],
+        'r2_fastq': ['meta': [:], 'read_num': 'R2'],
+        'fastq_1': ['meta': [:], 'read_num': 'R1'],
+        'fastq_2': ['meta': [:], 'read_num': 'R2']
     ]
 
     // Add paths of the fastq files to the meta map
@@ -99,15 +95,31 @@ def create_fastq_channel(LinkedHashMap row) {
             if (!file_path.exists()) {
                 error("ERROR: Please check input samplesheet -> ${value.read_num} FastQ file does not exist!\n${row[key]}")
             }
-            fastq_files << file_path
         }
     }
 
-    // Determine if the read is single-ended
-    if (!row.r2_fastq) {
-        meta.single_end = true
+    // Set r1_fastq and r2_fastq explicitly
+    def r1_fastq = null
+    def r2_fastq = null
+
+    // Validate R1 fastq file
+    if (row.r1_fastq) {
+        r1_fastq = file(row.r1_fastq)
+        if (!r1_fastq.exists()) {
+            error("ERROR: Please check input samplesheet -> R1 FastQ file does not exist!\n${row.r1_fastq}")
+        }
+    } else {
+        error("ERROR: R1 FastQ file is required but not found in the samplesheet for sample ${row.sample}")
     }
 
-    // Return the meta and fastq files list
-    return [meta, fastq_files]
+    // Validate R2 fastq file (optional)
+    if (row.r2_fastq) {
+        r2_fastq = file(row.r2_fastq)
+    } else {
+        meta.single_end = true  // Mark as single-end if R2 is missing
+        error("ERROR: Single-End is not supported ${row.sample}, exiting")
+    }
+
+    // Return the meta and the explicit r1 and r2 fastq files
+    return [meta, r1_fastq, r2_fastq]
 }
