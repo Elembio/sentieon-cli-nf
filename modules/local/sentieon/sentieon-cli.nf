@@ -11,10 +11,8 @@ process SENTIEON_CLI {
     path ml_model
 
     output:
-    tuple val(meta), path("*.bam"), path("*.bai"), emit: bam_bai
-    tuple val(meta), path("*.log"), emit: log
-    path "versions.yml", emit: versions
-
+    tuple val(meta), path("**"), emit: output
+    
     script:
     def args = task.ext.args ?: ''
 
@@ -39,13 +37,14 @@ process SENTIEON_CLI {
     #INDEX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
     #FASTA=`find -L ./ -maxdepth 1 -name "*.fa"`
 
-    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
+    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
 
     sentieon-cli dnascope \\
         -t $task.cpus \\
         -r $fasta \\
         --r1-fastq ${r1_fastq} \\
         --r2-fastq ${r2_fastq} \\
+        --bam_format \\
         --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" \\
         --model-bundle $ml_model \\
         --pcr-free \\

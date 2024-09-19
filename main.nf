@@ -62,7 +62,6 @@ workflow {
         ch_genome,
         model_file
     )
-    ch_versions = ch_versions.mix(SENTIEON_CLI.out.versions.first())
 
 }
 
