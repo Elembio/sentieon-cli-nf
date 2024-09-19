@@ -101,23 +101,25 @@ def create_fastq_channel(LinkedHashMap row) {
     // Set r1_fastq and r2_fastq explicitly
     def r1_fastq = null
     def r2_fastq = null
-
+    
     // Validate R1 fastq file
-    if (row.r1_fastq) {
-        r1_fastq = file(row.r1_fastq)
+    if (row.r1_fastq || row.fastq_1) {
+        r1_fastq = file(row.r1_fastq ? row.r1_fastq : row.fastq_1)
         if (!r1_fastq.exists()) {
-            error("ERROR: Please check input samplesheet -> R1 FastQ file does not exist!\n${row.r1_fastq}")
+            error("ERROR: Please check input samplesheet -> R1 FastQ file does not exist!\n${r1_fastq}")
         }
     } else {
         error("ERROR: R1 FastQ file is required but not found in the samplesheet for sample ${row.sample}")
     }
 
-    // Validate R2 fastq file (optional)
-    if (row.r2_fastq) {
-        r2_fastq = file(row.r2_fastq)
+    // Validate R1 fastq file
+    if (row.r2_fastq || row.fastq_2) {
+        r2_fastq = file(row.r2_fastq ? row.r2_fastq : row.fastq_2)
+        if (!r2_fastq.exists()) {
+            error("ERROR: Please check input samplesheet -> R2 FastQ file does not exist!\n${r2_fastq}")
+        }
     } else {
-        meta.single_end = true  // Mark as single-end if R2 is missing
-        error("ERROR: Single-End is not supported ${row.sample}, exiting")
+        error("ERROR: R2 FastQ file is required but not found in the samplesheet for sample ${row.sample}")
     }
 
     // Return the meta and the explicit r1 and r2 fastq files
