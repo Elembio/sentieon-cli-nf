@@ -51,10 +51,6 @@ process SENTIEON_CLI {
         --assay WGS \\
         ${prefix}.vcf.gz
 
-    touch ${prefix}.bam
-    touch ${prefix}.bam.bai
-
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         sentieon: \$(echo /opt/sentieon/sentieon-genomics-* 2>&1 | sed 's/\\/opt\\/sentieon\\/sentieon-genomics-//')
