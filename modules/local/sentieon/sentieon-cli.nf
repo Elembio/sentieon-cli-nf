@@ -2,6 +2,11 @@ process SENTIEON_CLI {
     tag "$meta.id"
     label 'process_high'
 
+    cpus = 32
+    memory = 64.GB
+    time = 6.h
+    maxRetries = 3
+    
     container "${params.sentieoncli_container_url}:${params.sentieoncli_container_tag}"
 
     input:
@@ -11,7 +16,11 @@ process SENTIEON_CLI {
     path ml_model
 
     output:
-    tuple val(meta), path("**"), emit: output
+    tuple val(meta), path("*_deduped.bam"), path("*_deduped.bam.bai"), emit: bam_bai
+    tuple val(meta), path("*.vcf.gz"), path("*.vcf.gz.tbi"), emit: vcf_tbi
+    tuple val(meta), path("*_metrics/*"), emit: metrics
+    tuple val(meta), path("*.log"), emit: log
+    path  "versions.yml", emit: versions
     
     script:
     def args = task.ext.args ?: ''
