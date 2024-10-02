@@ -43,21 +43,40 @@ workflow {
     ch_versions = Channel.empty()
 
     ch_genome = [params.fasta, params.fasta_fai]
-
+    
     Channel.value(ch_input)
-        .splitCsv(header: true, sep: ',')
-        .map { row -> 
-            // Process each row individually
-            create_fastq_channel(row)
-        }
-        .set { ch_fastq }
+        .splitCsv ( header:true, sep:',' )
+        .set { sheet }
 
+    ch_fastq = sheet.map { row -> [[row.sample], row] }
+        .groupTuple()
+        .map { meta, rows ->
+            [rows, rows.size()]
+        }
+        .transpose()
+        .map { row, numLanes ->
+            create_fastq_channel(row + [num_lanes:numLanes])
+        }
+            
+    ch_fastq
+        .map{ meta, r1_fastq, r2_fastq ->
+            grouped_id = meta.sample
+            grouped_prefix = meta.id
+            grouped_num_lanes = meta.num_lanes
+            grouped_meta = [id:grouped_id, prefix: grouped_prefix, read_group: grouped_id, num_lanes: grouped_num_lanes]
+            [grouped_meta, meta, r1_fastq, r2_fastq]
+            }
+        .groupTuple()
+        .set { ch_grouped_fastq }
+
+    ch_grouped_fastq.view()
+    
     // convert known sites to ch
     ch_known_sites = Channel.of(params.known_sites)
 
     // fastq -> bam (fq2bam)
     SENTIEON_CLI (
-        ch_fastq,
+        ch_grouped_fastq,
         params.bwa,
         ch_genome,
         model_file

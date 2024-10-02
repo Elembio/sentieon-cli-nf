@@ -10,7 +10,7 @@ process SENTIEON_CLI {
     container "${params.sentieoncli_container_url}:${params.sentieoncli_container_tag}"
 
     input:
-    tuple val(meta), path(r1_fastq), path(r2_fastq)
+    tuple val(meta), val(read_groups), path ( r1_fastq, stageAs: "?/*"), path ( r2_fastq, stageAs: "?/*")
     path index, stageAs: "index/*"
     tuple path(fasta), path(fai)
     path ml_model
@@ -33,6 +33,12 @@ process SENTIEON_CLI {
     def model_option = ml_model ? "-x ${ml_model}/bwa.model" : ''
     def memory = task.memory.toString().replaceAll(' ', '').replaceAll('GB','G')
 
+    //--readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" \\
+    // Concatenate read_groups into a space-separated string
+
+    // --r1-fastq a_r1.fastq.gz b_r1.fastq.gz c_r1.fastq.gz --r2-fastq a_r2.fastq.gz b_r2.fastq.gz c_r2.fastq.gz --readgroups "rg1" "rg2" "rg3"
+    def readgroups_string = read_groups.collect { rg -> "@RG\\tID:${rg.read_group}__${rg.sample}\\tSM:${rg.sample}\\tPL:${rg.platform}\\tLB:${rg.sample}"}.join('" "') 
+
     """
     logfile=run.log
     exec > >(tee \$logfile)
@@ -46,6 +52,11 @@ process SENTIEON_CLI {
     #INDEX=`find -L ./ -name "*.amb" | sed 's/.amb//'`
     #FASTA=`find -L ./ -maxdepth 1 -name "*.fa"`
 
+    echo $meta
+    echo $read_groups
+    echo $r1_fastq
+    echo $r2_fastq
+
     echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
 
     sentieon-cli dnascope \\
@@ -54,7 +65,7 @@ process SENTIEON_CLI {
         --r1-fastq ${r1_fastq} \\
         --r2-fastq ${r2_fastq} \\
         --bam_format \\
-        --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" \\
+        --readgroups "$readgroups_string" \\
         --model-bundle $ml_model \\
         --pcr-free \\
         --assay WGS \\
