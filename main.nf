@@ -68,8 +68,6 @@ workflow {
             }
         .groupTuple()
         .set { ch_grouped_fastq }
-
-    ch_grouped_fastq.view()
     
     // convert known sites to ch
     ch_known_sites = Channel.of(params.known_sites)
