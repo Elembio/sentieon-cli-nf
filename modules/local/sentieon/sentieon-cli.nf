@@ -1,6 +1,5 @@
 process SENTIEON_CLI {
     tag "$meta.id"
-    label 'process_high'
 
     cpus = 32
     memory = 64.GB
