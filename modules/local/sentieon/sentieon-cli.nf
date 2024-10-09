@@ -26,7 +26,7 @@ process SENTIEON_CLI {
 
     def license = params.sentieon_license
     def prefix = meta.prefix ? "${meta.prefix}" : "${meta.id}"
-    def read_group = meta.read_group ? "${meta.read_group}__${meta.sample}" : "RG"
+    def read_group_id = meta.read_group ? "${meta.read_group}__${meta.sample}" : "RG"
     def platform = meta.platform ? "${meta.platform}" : "PL"
     def sample = meta.sample ? "${meta.sample}" : "SM"
     def model_option = ml_model ? "-x ${ml_model}/bwa.model" : ''
@@ -46,7 +46,7 @@ process SENTIEON_CLI {
     LICENSE=$license
     export SENTIEON_LICENSE=$license
 
-    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
+    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "@RG\\tID:$read_group_id\\tSM:$sample\\tPL:$platform\\tLB:$sample" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
 
     sentieon-cli dnascope \\
         -t $task.cpus \\
