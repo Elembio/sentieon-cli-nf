@@ -1,62 +1,35 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/elembio/base2fastq-nf/master/nextflow_schema.json",
-  "title": "elembio/base2fastq-nf pipeline parameters",
-  "description": "Fastq Generation for AVITI",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/elembio/sentieon-cli-nf/master/nextflow_schema.json",
+  "title": "elembio/sentieon-cli-nf pipeline parameters",
+  "description": "sentieon-cli-nf",
   "type": "object",
-  "definitions": {
-    "unused": {
-      "title": "Unused",
-      "type": "object",
-      "description": "",
-      "default": "",
-      "properties": {
-        "fasta": {
-          "type": "string",
-          "hidden": true
-        },
-        "fasta_fai": {
-          "type": "string",
-          "hidden": true
-        },
-        "publish_dir_mode": {
-          "type": "string",
-          "default": "copy",
-          "hidden": true
-        }
-      }
-    },
+  "$defs": {
     "input_output_options": {
       "title": "Input/output options",
       "type": "object",
       "fa_icon": "fas fa-terminal",
       "description": "Define where the pipeline should find input data and save output data.",
-      "required": ["outdir", "genome"],
+      "required": ["outdir"],
       "properties": {
         "outdir": {
           "type": "string",
           "format": "directory-path",
-          "description": "output b2f dir/url",
+          "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
           "fa_icon": "fas fa-folder-open",
           "default": "./results"
-        },
+        }
+      }
+    },
+    "reference_genome": {
+      "title": "Reference Genome",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
         "genome": {
           "type": "string",
           "default": "GRCh38"
-        },
-        "ignore_samples": {
-          "type": "string",
-          "default": "['Unassigned', 'PhiX', 'phiX', 'CBPhiX', 'Undetermined']"
-        },
-        "model_file": {
-          "type": "string"
-        },
-        "interval_bed": {
-          "type": "string"
-        },
-        "known_sites": {
-          "type": "string",
-          "default": "[]"
         },
         "igenomes_base": {
           "type": "string",
@@ -67,124 +40,114 @@
         }
       }
     },
-    "institutional_config_options": {
-      "title": "Institutional config options",
+    "sentieon": {
+      "title": "Sentieon",
       "type": "object",
-      "fa_icon": "fas fa-university",
-      "description": "Parameters used to describe centralised config profiles. These should not be edited.",
-      "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
+      "description": "",
+      "default": "",
       "properties": {
-        "custom_config_version": {
-          "type": "string",
-          "description": "Git commit id for Institutional configs.",
-          "default": "master",
-          "hidden": true,
-          "fa_icon": "fas fa-users-cog"
+        "interval_bed": {
+          "type": "string"
         },
-        "custom_config_base": {
+        "sentieon_license": {
           "type": "string",
-          "description": "Base directory for Institutional configs.",
-          "default": "https://raw.githubusercontent.com/nf-core/configs/master",
-          "hidden": true,
-          "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-          "fa_icon": "fas fa-users-cog"
+          "default": "10.160.16.4:8990"
         },
-        "config_profile_name": {
+        "ignore_samples": {
           "type": "string",
-          "description": "Institutional config name.",
-          "hidden": true,
-          "fa_icon": "fas fa-users-cog"
+          "default": "['Unassigned', 'PhiX', 'phiX', 'CBPhiX', 'Undetermined']"
         },
-        "config_profile_description": {
-          "type": "string",
-          "description": "Institutional config description.",
-          "hidden": true,
-          "fa_icon": "fas fa-users-cog"
+        "sentieon_ml_model": {
+          "type": "string"
         },
-        "config_profile_contact": {
+        "sentieoncli_container_url": {
           "type": "string",
-          "description": "Institutional config contact information.",
-          "hidden": true,
-          "fa_icon": "fas fa-users-cog"
+          "default": "docker.io/sentieon/sentieon-cli"
         },
-        "config_profile_url": {
+        "sentieoncli_container_tag": {
           "type": "string",
-          "description": "Institutional config URL link.",
-          "hidden": true,
-          "fa_icon": "fas fa-users-cog"
-        }
-      }
-    },
-    "generic_options": {
-      "title": "Generic options",
-      "type": "object",
-      "fa_icon": "fas fa-file-import",
-      "description": "Less common options for the pipeline, typically set in a config file.",
-      "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
-      "properties": {
-        "tracedir": {
-          "type": "string",
-          "description": "Directory to keep pipeline Nextflow logs and reports.",
-          "default": "./results/pipeline_info",
-          "fa_icon": "fas fa-cogs",
-          "hidden": true
-        },
-        "enable_conda": {
-          "type": "boolean",
-          "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
-          "hidden": true,
-          "fa_icon": "fas fa-bacon"
+          "default": "v1.1.0-1"
         }
       }
     }
   },
   "allOf": [
     {
-      "$ref": "#/definitions/unused"
+      "$ref": "#/$defs/input_output_options"
     },
     {
-      "$ref": "#/definitions/input_output_options"
+      "$ref": "#/$defs/reference_genome"
     },
     {
-      "$ref": "#/definitions/institutional_config_options"
-    },
-    {
-      "$ref": "#/definitions/generic_options"
+      "$ref": "#/$defs/sentieon"
     }
   ],
   "properties": {
-    "use_elembio_igenomes": {
-      "type": "boolean"
-    },
-    "sentieon_license": {
+    "publish_dir_mode": {
       "type": "string",
-      "default": "52.12.17.193:8990"
+      "default": "copy"
     },
-    "sentieon_ml_model": {
-      "type": "string"
-    },
-    "sentieoncli_container_url": {
+    "tracedir": {
       "type": "string",
-      "default": "147637153406.dkr.ecr.us-west-2.amazonaws.com/modules/sentieon-cli"
+      "default": "./results/pipeline_info",
+      "hidden": true
     },
-    "sentieoncli_container_tag": {
-      "type": "number",
-      "default": 202308.03
+    "enable_conda": {
+      "type": "boolean",
+      "hidden": true
+    },
+    "custom_config_version": {
+      "type": "string",
+      "default": "master",
+      "hidden": true
+    },
+    "custom_config_base": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/nf-core/configs/master",
+      "hidden": true
+    },
+    "config_profile_description": {
+      "type": "string",
+      "hidden": true
+    },
+    "config_profile_contact": {
+      "type": "string",
+      "hidden": true
+    },
+    "config_profile_url": {
+      "type": "string",
+      "hidden": true
+    },
+    "config_profile_name": {
+      "type": "string",
+      "hidden": true
     },
     "max_memory": {
       "type": "string",
-      "default": "144.GB"
+      "default": "144.GB",
+      "hidden": true
     },
     "max_cpus": {
       "type": "integer",
-      "default": 72
+      "default": 72,
+      "hidden": true
     },
     "max_time": {
       "type": "string",
-      "default": "48.h"
+      "default": "48.h",
+      "hidden": true
+    },
+    "fasta": {
+      "type": "string",
+      "hidden": true
+    },
+    "fasta_fai": {
+      "type": "string",
+      "hidden": true
     },
     "bwa": {
-      "type": "string"
+      "type": "string",
+      "hidden": true
     }
   }
 }
