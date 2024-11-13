@@ -46,6 +46,17 @@
       "description": "",
       "default": "",
       "properties": {
+        "assay": {
+          "type": "string",
+          "default": "WGS"
+        },
+        "pcr": {
+          "type": "boolean",
+          "default": true
+        },
+        "bed": {
+          "type": "string"
+        },
         "interval_bed": {
           "type": "string"
         },
