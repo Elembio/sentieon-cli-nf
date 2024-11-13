@@ -21,8 +21,7 @@ log.info """\
  sentieon_ml_modle: ${params.sentieon_ml_model}
  known_sites: ${params.known_sites}
  igenomes_base: ${params.igenomes_base}
- igenomes_ignore: ${params.igenomes_ignore}
- use_elembio_igenomes: ${params.use_elembio_igenomes}
+ igenomes_ignore: ${params.igenomes_ignore} 
  ======================================================
  """
 
@@ -36,7 +35,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 include { SENTIEON_CLI } from './modules/local/sentieon/sentieon-cli'
 
 def model_file = params.sentieon_ml_model ? file(params.sentieon_ml_model, checkIfExists: true) : [] 
-def interval_bed = params.interval_bed ? file(params.interval_bed, checkIfExists: true) : [] 
+def bed = params.bed ? file(params.bed, checkIfExists: true) : [] 
 
 workflow {  
 
@@ -77,7 +76,9 @@ workflow {
         ch_grouped_fastq,
         params.bwa,
         ch_genome,
-        model_file
+        model_file,
+        params.assay,
+        bed
     )
 
 }

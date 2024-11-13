@@ -13,6 +13,8 @@ process SENTIEON_CLI {
     path index, stageAs: "index/*"
     tuple path(fasta), path(fai)
     path ml_model
+    val assay
+    path bed
 
     output:
     tuple val(meta), path("*_deduped.bam"), path("*_deduped.bam.bai"), emit: bam_bai
@@ -23,16 +25,12 @@ process SENTIEON_CLI {
     
     script:
     def args = task.ext.args ?: ''
-
     def license = params.sentieon_license
     def prefix = meta.prefix ? "${meta.prefix}" : "${meta.id}"
     def model_option = ml_model ? "-x ${ml_model}/bwa.model" : ''
+    def pcr_option = params.pcr ? "" : "--pcr-free"
+    def bed_option = bed ? "--bed ${bed}" : ''
     def memory = task.memory.toString().replaceAll(' ', '').replaceAll('GB','G')
-
-    //--readgroups "@RG\\tID:$read_group\\tSM:$sample\\tPL:$platform\\tLB:$sample" \\
-    // Concatenate read_group into a space-separated string
-    // --r1-fastq a_r1.fastq.gz b_r1.fastq.gz c_r1.fastq.gz --r2-fastq a_r2.fastq.gz b_r2.fastq.gz c_r2.fastq.gz --readgroups "rg1" "rg2" "rg3"
-    
     def readgroups_string = read_group.collect { rg -> "@RG\\tID:${rg.read_group}__${rg.sample}\\tSM:${rg.sample}\\tPL:${rg.platform}\\tLB:${rg.sample}"}.join('" "') 
 
     """
@@ -45,7 +43,7 @@ process SENTIEON_CLI {
 
     find -L $index/ -type f \\! -name "*.fa" -exec ln -s {} . \\;
     
-    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "$readgroups_string" --model-bundle $ml_model --pcr-free --assay WGS ${prefix}.vcf.gz"
+    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "$readgroups_string" --model-bundle $ml_model --assay $assay ${pcr_option} ${bed_option} ${prefix}.vcf.gz"
 
     sentieon-cli dnascope \\
         -t $task.cpus \\
@@ -55,13 +53,41 @@ process SENTIEON_CLI {
         --bam_format \\
         --readgroups "$readgroups_string" \\
         --model-bundle $ml_model \\
-        --pcr-free \\
-        --assay WGS \\
+        --assay $assay \\
+        ${pcr_option} \\
+        ${bed_option} \\
         ${prefix}.vcf.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         sentieon: \$(echo /opt/sentieon/sentieon-genomics-* 2>&1 | sed 's/\\/opt\\/sentieon\\/sentieon-genomics-//')
+    END_VERSIONS
+    """
+
+    stub:
+    def args = task.ext.args ?: ''
+    def license = params.sentieon_license
+    def prefix = meta.prefix ? "${meta.prefix}" : "${meta.id}"
+    def model_option = ml_model ? "-x ${ml_model}/bwa.model" : ''
+    def pcr_option = params.pcr ? "" : "--pcr-free"
+    def bed_option = bed ? "--bed ${bed}" : ''
+    def memory = task.memory.toString().replaceAll(' ', '').replaceAll('GB','G')
+    def readgroups_string = read_group.collect { rg -> "@RG\\tID:${rg.read_group}__${rg.sample}\\tSM:${rg.sample}\\tPL:${rg.platform}\\tLB:${rg.sample}"}.join('" "') 
+    """
+    echo "stub for SENTIEON_CLI"
+    touch ${prefix}_deduped.bam
+    touch ${prefix}_deduped.bam.bai
+    touch ${prefix}.vcf.gz
+    touch ${prefix}.vcf.gz.tbi
+    mkdir ${prefix}_metrics/
+    touch ${prefix}_metrics/metrics
+    touch ${prefix}.log
+
+    echo "sentieon-cli dnascope -t $task.cpus -r $fasta --r1-fastq ${r1_fastq} --r2-fastq ${r2_fastq} --bam_format --readgroups "$readgroups_string" --model-bundle $ml_model --assay $assay ${pcr_option} ${bed_option} ${prefix}.vcf.gz"
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+            pbrun: "stub version"
     END_VERSIONS
     """
 }
