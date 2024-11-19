@@ -33,9 +33,10 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 include { SENTIEON_CLI } from './modules/local/sentieon/sentieon-cli'
+include { MULTIQC } from './modules/nf-core/multiqc/main'
 
 def model_file = params.sentieon_ml_model ? file(params.sentieon_ml_model, checkIfExists: true) : [] 
-def bed = params.bed ? file(params.bed, checkIfExists: true) : [] 
+def target_region_bed = params.target_region_bed ? file(params.target_region_bed, checkIfExists: true) : [] 
 
 workflow {  
 
@@ -72,14 +73,34 @@ workflow {
     ch_known_sites = Channel.of(params.known_sites)
 
     // fastq -> bam (fq2bam)
+    // turn off cli multiqc, pass outputs to below
     SENTIEON_CLI (
         ch_grouped_fastq,
         params.bwa,
         ch_genome,
         model_file,
         params.assay,
-        bed
+        target_region_bed
     )
+
+    // MultiQC
+    // get multiqc conf files
+    ch_multiqc_config = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+    ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+    ch_multiqc_logo = params.multiqc_logo ? Channel.fromPath(params.multiqc_logo, checkIfExists: true) : Channel.fromPath("$projectDir/assets/Element_Biosciences_Logo_Black_RGB.png", checkIfExists: true)
+
+    ch_multiqc_files = Channel.empty()
+    ch_multiqc_files = ch_multiqc_files.mix(SENTIEON_CLI.out.metrics.collect{it[1]}.ifEmpty([]))
+    
+    MULTIQC (
+        ch_multiqc_files.collect(),
+        ch_multiqc_config.toList(),
+        ch_multiqc_custom_config.toList(),
+        ch_multiqc_logo.toList()
+    )
+    multiqc_report = MULTIQC.out.report.toList()
+    
+
 
 }
 

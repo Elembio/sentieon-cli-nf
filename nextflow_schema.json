@@ -12,6 +12,9 @@
       "description": "Define where the pipeline should find input data and save output data.",
       "required": ["outdir"],
       "properties": {
+        "input": {
+          "type": "string"
+        },
         "outdir": {
           "type": "string",
           "format": "directory-path",
@@ -46,6 +49,13 @@
       "description": "",
       "default": "",
       "properties": {
+        "batch_size": {
+          "type": "integer",
+          "default": 8
+        },
+        "target_region_bed": {
+          "type": "string"
+        },
         "assay": {
           "type": "string",
           "default": "WGS"
@@ -53,12 +63,6 @@
         "pcr": {
           "type": "boolean",
           "default": true
-        },
-        "bed": {
-          "type": "string"
-        },
-        "interval_bed": {
-          "type": "string"
         },
         "sentieon_license": {
           "type": "string",
@@ -80,6 +84,29 @@
           "default": "v1.1.0-1"
         }
       }
+    },
+    "infrastructure": {
+      "title": "Infrastructure",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "max_cpus": {
+          "type": "integer",
+          "default": 72,
+          "hidden": true
+        },
+        "max_memory": {
+          "type": "string",
+          "default": "144.GB",
+          "hidden": true
+        },
+        "max_time": {
+          "type": "string",
+          "default": "48.h",
+          "hidden": true
+        }
+      }
     }
   },
   "allOf": [
@@ -91,6 +118,9 @@
     },
     {
       "$ref": "#/$defs/sentieon"
+    },
+    {
+      "$ref": "#/$defs/infrastructure"
     }
   ],
   "properties": {
@@ -133,21 +163,6 @@
       "type": "string",
       "hidden": true
     },
-    "max_memory": {
-      "type": "string",
-      "default": "144.GB",
-      "hidden": true
-    },
-    "max_cpus": {
-      "type": "integer",
-      "default": 72,
-      "hidden": true
-    },
-    "max_time": {
-      "type": "string",
-      "default": "48.h",
-      "hidden": true
-    },
     "fasta": {
       "type": "string",
       "hidden": true
@@ -159,6 +174,19 @@
     "bwa": {
       "type": "string",
       "hidden": true
+    },
+    "multiqc_config": {
+      "type": "string"
+    },
+    "multiqc_title": {
+      "type": "string"
+    },
+    "max_multiqc_email_size": {
+      "type": "string",
+      "default": "25.MB"
+    },
+    "multiqc_logo": {
+      "type": "string"
     }
   }
 }
