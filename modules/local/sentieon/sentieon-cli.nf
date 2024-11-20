@@ -1,10 +1,6 @@
 process SENTIEON_CLI {
     tag "$meta.id"
-
-    cpus = 32
-    memory = 64.GB
-    time = 6.h
-    maxRetries = 3
+    label 'process_high'
     
     container "${params.sentieoncli_container_url}:${params.sentieoncli_container_tag}"
 
