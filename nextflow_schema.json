@@ -50,8 +50,7 @@
       "default": "",
       "properties": {
         "batch_size": {
-          "type": "integer",
-          "default": 8
+          "type": "integer"
         },
         "target_region_bed": {
           "type": "string"
