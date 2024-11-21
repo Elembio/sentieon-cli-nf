@@ -20,6 +20,7 @@ log.info """\
  bwa: ${params.bwa}
  sentieon_ml_modle: ${params.sentieon_ml_model}
  known_sites: ${params.known_sites}
+ ignore_samples: ${params.ignore_samples}
  igenomes_base: ${params.igenomes_base}
  igenomes_ignore: ${params.igenomes_ignore} 
  ======================================================
@@ -48,7 +49,9 @@ workflow {
         .splitCsv ( header:true, sep:',' )
         .set { sheet }
 
-    ch_fastq = sheet.map { row -> [[row.sample], row] }
+    ch_fastq = sheet
+        .filter { row -> !params.ignore_samples.contains(row.sample) } // Skip matching samples
+        .map { row -> [[row.sample], row] }
         .groupTuple()
         .map { meta, rows ->
             [rows, rows.size()]
