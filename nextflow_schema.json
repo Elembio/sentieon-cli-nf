@@ -107,6 +107,27 @@
           "hidden": true
         }
       }
+    },
+    "multiqc": {
+      "title": "MultiQC",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "multiqc_config": {
+          "type": "string"
+        },
+        "multiqc_title": {
+          "type": "string"
+        },
+        "max_multiqc_email_size": {
+          "type": "string",
+          "default": "25.MB"
+        },
+        "multiqc_logo": {
+          "type": "string"
+        }
+      }
     }
   },
   "allOf": [
@@ -121,6 +142,9 @@
     },
     {
       "$ref": "#/$defs/infrastructure"
+    },
+    {
+      "$ref": "#/$defs/multiqc"
     }
   ],
   "properties": {
@@ -174,19 +198,6 @@
     "bwa": {
       "type": "string",
       "hidden": true
-    },
-    "multiqc_config": {
-      "type": "string"
-    },
-    "multiqc_title": {
-      "type": "string"
-    },
-    "max_multiqc_email_size": {
-      "type": "string",
-      "default": "25.MB"
-    },
-    "multiqc_logo": {
-      "type": "string"
     }
   }
 }
