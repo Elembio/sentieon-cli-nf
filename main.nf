@@ -15,15 +15,19 @@ log.info """\
  outdir: ${params.outdir}
  ======================================================
  genome: ${params.genome}
+ sentieon_ml_model: ${params.sentieon_ml_model}
+ sentieon_license: ${params.sentieon_license}
+ assay: ${params.assay}
+ pcr: ${params.pcr}
+ known_sites: ${params.known_sites}
+ ======================================================
  fasta: ${params.fasta}
  fasta_fai: ${params.fasta_fai}
  bwa: ${params.bwa}
- sentieon_ml_modle: ${params.sentieon_ml_model}
- known_sites: ${params.known_sites}
  ignore_samples: ${params.ignore_samples}
  igenomes_base: ${params.igenomes_base}
  igenomes_ignore: ${params.igenomes_ignore} 
- ======================================================
+
  """
 
 // Check mandatory parameters
