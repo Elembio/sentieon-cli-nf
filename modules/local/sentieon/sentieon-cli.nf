@@ -50,6 +50,7 @@ process SENTIEON_CLI {
         --readgroups "$readgroups_string" \\
         --model-bundle $ml_model \\
         --assay $assay \\
+        --skip-multiqc \\
         ${pcr_option} \\
         ${target_region_bed_option} \\
         ${prefix}.vcf.gz
