@@ -1,6 +1,6 @@
 {
-    "name": "elembio/parabricks-nf",
-    "homePage": "https://gitlab.com/elembio/analysis/nextflow-workflows/parabricks-nf",
+    "name": "elembio/sentieon-cli-nf",
+    "homePage": "https://github.com/Elembio/sentieon-cli-nf",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
