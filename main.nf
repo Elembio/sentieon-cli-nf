@@ -27,7 +27,10 @@ log.info """\
  ignore_samples: ${params.ignore_samples}
  igenomes_base: ${params.igenomes_base}
  igenomes_ignore: ${params.igenomes_ignore} 
-
+ ======================================================
+ custom_config_version: ${params.custom_config_version}
+ custom_config_base: ${params.custom_config_base}
+ ======================================================
  """
 
 // Check mandatory parameters

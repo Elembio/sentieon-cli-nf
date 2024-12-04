@@ -1,0 +1,75 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+
+    test("test") {
+        tag "local"
+
+        when {
+            params {
+                input = "${baseDir}/tests/csv/small_fastq.csv"
+                outdir = "$outputDir"
+                genome = "hg38_chr20"
+                sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
+                assay = "WGS"
+                target_region_bed = null
+                pcr = false
+                known_sites = []
+                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.trace.succeeded().size() == 1
+        }
+    }
+
+    test("test_enrichment_twist") {
+        tag "local"
+
+        when {
+            params {
+                input = "${baseDir}/tests/csv/small_trinity_twist_fastq.csv"
+                outdir = "$outputDir"
+                genome = "hg38_chr20"
+                sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
+                assay = "WES"
+                target_region_bed = "s3://element-public-data/testdata/exome/hg38_exome_comp_spikein_v2.0.2_targets_sorted.re_annotated.bed"
+                pcr = true
+                known_sites = []
+                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.trace.succeeded().size() == 1
+        }
+    }
+
+    test("test_enrichment_idt") {
+        tag "local"
+
+        when {
+            params {
+                input = "${baseDir}/tests/csv/small_trinity_idt_fastq.csv"
+                outdir = "$outputDir"
+                genome = "hg38_chr20"
+                sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
+                assay = "WES"
+                target_region_bed = "s3://element-public-data/testdata/exome/xgen-exome-hyb-panel-v2-targets-hg38.bed"
+                pcr = true
+                known_sites = []
+                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.trace.succeeded().size() == 1
+        }
+    }
+
+}

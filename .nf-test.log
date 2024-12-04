@@ -1,8 +1,0 @@
-Dec-03 09:08:53.903 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.2
-Dec-03 09:08:53.931 [main] INFO  com.askimed.nf.test.App - Arguments: [test]
-Dec-03 09:08:55.392 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 24.10.0
-Dec-03 09:08:55.394 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /home/bryan/git/sentieon-cli-nf/nf-test.config...
-Dec-03 09:08:56.160 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 5 files from directory /home/bryan/git/sentieon-cli-nf in 0.113 sec
-Dec-03 09:08:56.161 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 0 files containing tests.
-Dec-03 09:08:56.161 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found files: []
-Dec-03 09:08:56.163 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Found 0 tests to execute.
