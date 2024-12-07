@@ -3,11 +3,12 @@ nextflow_pipeline {
     name "Test Workflow main.nf"
     script "main.nf"
 
-    test("test") {
+    test("test_small") {
         tag "local"
 
         when {
             params {
+                
                 input = "${baseDir}/tests/csv/small_fastq.csv"
                 outdir = "$outputDir"
                 genome = "hg38_chr20"
@@ -17,12 +18,78 @@ nextflow_pipeline {
                 pcr = false
                 known_sites = []
                 ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+
+                igenomes_base = "s3://elembio-macro-igenomes/igenomes"
+
+                genomes {
+                    'GRCh38' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/WholeGenomeFasta/genome.fa"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/BWAIndex/version0.6.0/"
+                        mito_name   = "chrM"
+                        blacklist   = "${projectDir}/assets/blacklists/hg38-blacklist.bed"
+                    }
+                    'hg38_chr20' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa"
+                        fasta_fai   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.fai"
+                        fasta_dir   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/"
+                        genome_file = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.genome"
+                        chrom_sizes = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.chrom.sizes"
+                        genome_dict = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.dict"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/bwa_index/"
+                    }
+                }
+                
             }
         }
 
         then {
             assert workflow.success
-            assert workflow.trace.succeeded().size() == 1
+            assert workflow.trace.succeeded().size() == 3
+        }
+    }
+
+    test("test") {
+        tag "local"
+
+        when {
+            params {
+                
+                input = "${baseDir}/tests/csv/small_fastq.csv"
+                outdir = "$outputDir"
+                genome = "GRCh38"
+                sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
+                assay = "WGS"
+                target_region_bed = null
+                pcr = false
+                known_sites = []
+                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+
+                igenomes_base = "s3://elembio-macro-igenomes/igenomes"
+
+                genomes {
+                    'GRCh38' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/WholeGenomeFasta/genome.fa"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/BWAIndex/version0.6.0/"
+                        mito_name   = "chrM"
+                        blacklist   = "${projectDir}/assets/blacklists/hg38-blacklist.bed"
+                    }
+                    'hg38_chr20' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa"
+                        fasta_fai   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.fai"
+                        fasta_dir   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/"
+                        genome_file = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.genome"
+                        chrom_sizes = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.chrom.sizes"
+                        genome_dict = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.dict"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/bwa_index/"
+                    }
+                }
+                
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.trace.succeeded().size() == 3
         }
     }
 
@@ -31,21 +98,43 @@ nextflow_pipeline {
 
         when {
             params {
+                
                 input = "${baseDir}/tests/csv/small_trinity_twist_fastq.csv"
                 outdir = "$outputDir"
-                genome = "hg38_chr20"
+                genome = "GRCh38"
                 sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
                 assay = "WES"
                 target_region_bed = "s3://element-public-data/testdata/exome/hg38_exome_comp_spikein_v2.0.2_targets_sorted.re_annotated.bed"
                 pcr = true
                 known_sites = []
                 ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+
+                igenomes_base = "s3://elembio-macro-igenomes/igenomes"
+
+                genomes {
+                    'GRCh38' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/WholeGenomeFasta/genome.fa"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/BWAIndex/version0.6.0/"
+                        mito_name   = "chrM"
+                        blacklist   = "${projectDir}/assets/blacklists/hg38-blacklist.bed"
+                    }
+                    'hg38_chr20' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa"
+                        fasta_fai   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.fai"
+                        fasta_dir   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/"
+                        genome_file = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.genome"
+                        chrom_sizes = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.chrom.sizes"
+                        genome_dict = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.dict"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/bwa_index/"
+                    }
+                }
+
             }
         }
 
         then {
             assert workflow.success
-            assert workflow.trace.succeeded().size() == 1
+            assert workflow.trace.succeeded().size() == 2
         }
     }
 
@@ -54,21 +143,43 @@ nextflow_pipeline {
 
         when {
             params {
+
                 input = "${baseDir}/tests/csv/small_trinity_idt_fastq.csv"
                 outdir = "$outputDir"
-                genome = "hg38_chr20"
+                genome = "GRCh38"
                 sentieon_ml_model = "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
                 assay = "WES"
                 target_region_bed = "s3://element-public-data/testdata/exome/xgen-exome-hyb-panel-v2-targets-hg38.bed"
                 pcr = true
                 known_sites = []
                 ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+
+                igenomes_base = "s3://elembio-macro-igenomes/igenomes"
+
+                genomes {
+                    'GRCh38' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/WholeGenomeFasta/genome.fa"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/NCBI/GRCh38/Sequence/BWAIndex/version0.6.0/"
+                        mito_name   = "chrM"
+                        blacklist   = "${projectDir}/assets/blacklists/hg38-blacklist.bed"
+                    }
+                    'hg38_chr20' {
+                        fasta       = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa"
+                        fasta_fai   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.fai"
+                        fasta_dir   = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/"
+                        genome_file = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.genome"
+                        chrom_sizes = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.chrom.sizes"
+                        genome_dict = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/fasta/hg38_chr20.fa.dict"
+                        bwa         = "${params.igenomes_base}/Homo_sapiens/elembio/hg38_chr20/bwa_index/"
+                    }
+                }
+
             }
         }
 
         then {
             assert workflow.success
-            assert workflow.trace.succeeded().size() == 1
+            assert workflow.trace.succeeded().size() == 2
         }
     }
 
