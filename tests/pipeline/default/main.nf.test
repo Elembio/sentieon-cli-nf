@@ -62,7 +62,7 @@ nextflow_pipeline {
                 target_region_bed = null
                 pcr = false
                 known_sites = []
-                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+                ignore_samples  = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
 
                 igenomes_base = "s3://elembio-macro-igenomes/igenomes"
 
@@ -107,7 +107,7 @@ nextflow_pipeline {
                 target_region_bed = "s3://element-public-data/testdata/exome/hg38_exome_comp_spikein_v2.0.2_targets_sorted.re_annotated.bed"
                 pcr = true
                 known_sites = []
-                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+                ignore_samples = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
 
                 igenomes_base = "s3://elembio-macro-igenomes/igenomes"
 
@@ -152,7 +152,7 @@ nextflow_pipeline {
                 target_region_bed = "s3://element-public-data/testdata/exome/xgen-exome-hyb-panel-v2-targets-hg38.bed"
                 pcr = true
                 known_sites = []
-                ignore_samples             = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
+                ignore_samples = ["Unassigned", "PhiX", "phiX", "CBPhiX", "Undetermined"]
 
                 igenomes_base = "s3://elembio-macro-igenomes/igenomes"
 
