@@ -65,15 +65,15 @@
           "default": true
         },
         "sentieon_license": {
-          "type": "string",
-          "default": "10.160.16.4:8990"
+          "type": "string"
         },
         "ignore_samples": {
           "type": "string",
           "default": "['Unassigned', 'PhiX', 'phiX', 'CBPhiX', 'Undetermined']"
         },
         "sentieon_ml_model": {
-          "type": "string"
+          "type": "string",
+          "default": "https://s3.amazonaws.com/sentieon-release/other/DNAscopeElementBioWGS2.0.bundle"
         },
         "sentieoncli_container_url": {
           "type": "string",
@@ -163,12 +163,12 @@
     },
     "custom_config_version": {
       "type": "string",
-      "default": "master",
+      "default": "main",
       "hidden": true
     },
     "custom_config_base": {
       "type": "string",
-      "default": "https://raw.githubusercontent.com/nf-core/configs/master",
+      "default": "https://raw.githubusercontent.com/nf-core/configs/main",
       "hidden": true
     },
     "config_profile_description": {
