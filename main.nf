@@ -158,14 +158,18 @@ def create_fastq_channel(LinkedHashMap row) {
         error("ERROR: R1 FastQ file is required but not found in the samplesheet for sample ${row.sample}")
     }
 
-    // Validate R1 fastq file
+    // Validate R2 fastq file (OPTIONAL)
     if (row.r2_fastq || row.fastq_2) {
         r2_fastq = file(row.r2_fastq ? row.r2_fastq : row.fastq_2)
         if (!r2_fastq.exists()) {
-            error("ERROR: Please check input samplesheet -> R2 FastQ file does not exist!\n${r2_fastq}")
+            log.warn "WARNING: R2 FastQ file does not exist for sample ${row.sample}. Proceeding as single-end."
+            r2_fastq = null
         }
-    } else {
-        error("ERROR: R2 FastQ file is required but not found in the samplesheet for sample ${row.sample}")
+    }
+
+    // Determine if the read is single-ended
+    if (!row.fastq_2) {
+        meta.single_end = true
     }
 
     // Return the meta and the explicit r1 and r2 fastq files
