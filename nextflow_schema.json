@@ -62,14 +62,17 @@
         },
         "pcr": {
           "type": "boolean",
-          "default": true
+          "default": true,
+          "description": "pcr status"
         },
         "sentieon_license": {
           "type": "string"
         },
         "ignore_samples": {
-          "type": "string",
-          "default": "['Unassigned', 'PhiX', 'phiX', 'CBPhiX', 'Undetermined']"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "sentieon_ml_model": {
           "type": "string",
