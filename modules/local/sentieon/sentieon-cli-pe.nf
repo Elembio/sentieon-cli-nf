@@ -1,11 +1,11 @@
-process SENTIEON_CLI {
+process SENTIEON_CLI_PE {
     tag "$meta.id"
     label 'process_high'
     
     container "${params.sentieoncli_container_url}:${params.sentieoncli_container_tag}"
 
     input:
-    tuple val(meta), val(read_group), path ( r1_fastq, stageAs: "?/*"), path ( r2_fastq, stageAs: "?/*")
+    tuple val(meta), val(read_group), path(r1_fastq, stageAs: "?/*"), path(r2_fastq, stageAs: "?/*")
     path index, stageAs: "index/*"
     tuple path(fasta), path(fai)
     path ml_model

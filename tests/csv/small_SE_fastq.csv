@@ -1,0 +1,11 @@
+sample,read_group,platform,gender,pcr,fastq_1,fastq_2
+sysDVT-adept-HG001,NIST-001,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R2.fastq.gz
+sysDVT-adept-HG001,NIST-001,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R2.fastq.gz
+sysDVT-adept-HG001,NIST-002,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R2.fastq.gz
+sysDVT-adept-HG002,NIST-003,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R2.fastq.gz
+sysDVT-adept-HG003,NIST-003,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R2.fastq.gz
+sysDVT-adept-HG001SE,NIST-001SE,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,
+sysDVT-adept-HG001SE,NIST-001SE,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,
+sysDVT-adept-HG002SE,NIST-002SE,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,
+sysDVT-adept-HG003SE,NIST-003SE,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,
+sysDVT-adept-HG003SE,NIST-003SE,ELEMENT,female,False,s3://element-public-data/testdata/fastq/sysDVT-adept-HG001__10000r/sysDVT-adept-HG001_FQD-2x150x150-10000r_R1.fastq.gz,
