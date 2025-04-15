@@ -40,8 +40,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check input path parameters to see if they exist
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
-include { SENTIEON_CLI_PE } from './modules/local/sentieon/sentieon-cli-pe'
-include { SENTIEON_CLI_SE } from './modules/local/sentieon/sentieon-cli-se'
+include { SENTIEON_CLI } from './modules/local/sentieon/sentieon-cli'
 include { MULTIQC } from './modules/nf-core/multiqc/main'
 
 def model_file = params.sentieon_ml_model ? file(params.sentieon_ml_model, checkIfExists: true) : [] 
@@ -86,9 +85,9 @@ workflow {
 
     // fastq -> bam (fq2bam)
     // turn off cli multiqc, pass outputs to below
-    
+
     ch_grouped_fastq
-        .filter { grouped_meta, metas, r1, r2 ->
+        .map { grouped_meta, metas, r1, r2 ->
             def all_se = metas.every { it.single_end }
             def all_pe = metas.every { !it.single_end }
 
@@ -96,45 +95,21 @@ workflow {
                 error "ERROR: Inconsistent 'single_end' flags in grouped sample: ${grouped_meta.id} → ${metas*.single_end}"
             }
 
-            return all_se
+            def fixed_r2 = all_se ? [] : r2
+            grouped_meta.single_end = metas.single_end
+            tuple(grouped_meta, metas, r1, fixed_r2)
         }
-        .map { grouped_meta, metas, r1, r2 -> 
-            tuple(grouped_meta, metas, r1) // drop r2
-        }
-        .set { ch_se }
-    
-    ch_grouped_fastq
-        .filter { grouped_meta, metas, r1, r2 ->
-            def all_se = metas.every { it.single_end }
-            def all_pe = metas.every { !it.single_end }
+        .set { ch_grouped_fastq_normalized }
 
-            if (!all_se && !all_pe) {
-                error "ERROR: Inconsistent 'single_end' flags in grouped sample: ${grouped_meta.id} → ${metas*.single_end}"
-            }
-
-            return all_pe
-        }
-        .set { ch_pe }
-    
-    SENTIEON_CLI_SE (
-        ch_se,
+    SENTIEON_CLI (
+        ch_grouped_fastq_normalized,
         params.bwa,
         ch_genome,
         model_file,
         params.assay,
         target_region_bed
     )
-    ch_multiqc_files = ch_multiqc_files.mix(SENTIEON_CLI_SE.out.metrics.collect{it[1]}.ifEmpty([]))
-
-    SENTIEON_CLI_PE (
-        ch_pe,
-        params.bwa,
-        ch_genome,
-        model_file,
-        params.assay,
-        target_region_bed
-    )
-    ch_multiqc_files = ch_multiqc_files.mix(SENTIEON_CLI_PE.out.metrics.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(SENTIEON_CLI.out.metrics.collect{it[1]}.ifEmpty([]))
 
     // MultiQC
     // get multiqc conf files
@@ -203,7 +178,7 @@ def create_fastq_channel(LinkedHashMap row) {
         r2_fastq = file(row.r2_fastq ? row.r2_fastq : row.fastq_2)
         if (!r2_fastq.exists()) {
             log.warn "WARNING: R2 FastQ file does not exist for sample ${row.sample}. Proceeding as single-end."
-            r2_fastq = nulls
+            r2_fastq = null
         }
     }
 

@@ -1,4 +1,4 @@
-process SENTIEON_CLI_PE {
+process SENTIEON_CLI {
     tag "$meta.id"
     label 'process_high'
     
